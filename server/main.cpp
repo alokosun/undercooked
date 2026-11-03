@@ -1,18 +1,32 @@
 #include <iostream>
-#include "Player.h"
+#include "GameState.h"
 
-int main() {
-    std::cout << "Undercooked Server Starting..." << std::endl;
+int main()
+{
+    GameState game;
 
-    Player player1(1, 2.0f, 3.0f);
+    std::cout << "Undercooked Server Starting...\n\n";
 
-    std::cout << "Player " << player1.getId()
-              << " spawned at ("
-              << player1.getX()
-              << ", "
-              << player1.getY()
-              << ")"
-              << std::endl;
+    game.getMap().printMap();
+
+    Player& player1 = game.getPlayer1();
+
+    std::cout << "\nPlayer 1 starts at ("
+              << player1.getX() << ", "
+              << player1.getY() << ")\n";
+
+    if (game.movePlayer(1, 1, 0))
+    {
+        std::cout << "Player 1 moved successfully.\n";
+    }
+    else
+    {
+        std::cout << "Player 1 movement blocked.\n";
+    }
+
+    std::cout << "Player 1 is now at ("
+              << player1.getX() << ", "
+              << player1.getY() << ")\n";
 
     return 0;
 }
