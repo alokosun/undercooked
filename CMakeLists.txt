@@ -10,6 +10,8 @@ add_executable(undercooked_server
     shared/Player.cpp
     shared/Map.cpp
     shared/GameState.cpp
+    shared/Item.cpp
+    shared/Station.cpp
 )
 
 target_include_directories(undercooked_server PRIVATE shared)
