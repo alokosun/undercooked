@@ -1,0 +1,5 @@
+#!/bin/bash
+
+x86_64-w64-mingw32-g++ -Wall -Wextra -std=c++17 -static-libgcc -static-libstdc++ -o client.exe client-windows.cpp -lws2_32
+cp client.exe "/mnt/c/Users/Grace/Documents/SKOOL/CCN/Testing Scripts"
+echo "successfully copied to /mnt/c/Users/Grace/Documents/SKOOL/CCN/Testing Scripts/client.exe"
