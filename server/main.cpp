@@ -4,55 +4,139 @@
 
 int main()
 {
-    std::cout << "Undercooked Interaction Test\n\n";
-
     GameState game;
 
-    // Chopping station is at (4,2)
-    Item lettuce(1, ItemType::Lettuce);
+    std::cout << "Undercooked Full Snapshot Test\n\n";
 
-    // Put Player 1 next to the chopping station
-    game.getPlayer1().setPosition(3.0f, 2.0f);
+    Player& player1 = game.getPlayer1();
 
-    std::cout << "Player 1 position: ("
-              << game.getPlayer1().getX() << ", "
-              << game.getPlayer1().getY() << ")\n";
+    // ---------------------------------
+    // Movement
+    // ---------------------------------
 
-    std::cout << "Testing adjacent interaction...\n";
+    game.handleAction(
+        1,
+        ActionType::MoveRight
+    );
 
-    game.placeItemAtStation(&lettuce, 2);
+    // ---------------------------------
+    // Put chopped patty on stove
+    // ---------------------------------
 
-    if (game.chopAtStation(1, 2))
+    Item patty(1, ItemType::Patty);
+    patty.setState(ItemState::Chopped);
+
+    game.placeItemAtStation(
+        &patty,
+        3
+    );
+
+    // Move beside stove and start cooking
+    player1.setPosition(5, 2);
+
+    game.handleAction(
+        1,
+        ActionType::Cook,
+        3
+    );
+
+    // Advance cooking timer by 2 seconds
+    game.updateCookingTimers(2);
+
+    // Advance order timers by 10 seconds
+    game.updateOrders(10);
+
+    // ---------------------------------
+    // Get snapshot
+    // ---------------------------------
+
+    GameSnapshot snapshot =
+        game.getSnapshot();
+
+    // ---------------------------------
+    // Player state
+    // ---------------------------------
+
+    std::cout << "=== Players ===\n";
+
+    std::cout << "Player 1: ID="
+              << snapshot.player1.playerId
+              << " Position=("
+              << snapshot.player1.x
+              << ", "
+              << snapshot.player1.y
+              << ")\n";
+
+    std::cout << "Player 2: ID="
+              << snapshot.player2.playerId
+              << " Position=("
+              << snapshot.player2.x
+              << ", "
+              << snapshot.player2.y
+              << ")\n\n";
+
+    // ---------------------------------
+    // Station state
+    // ---------------------------------
+
+    std::cout << "=== Stations ===\n";
+
+    for (int i = 0; i < 5; i++)
     {
-        std::cout << "PASS: Player 1 was close enough and chopped the lettuce.\n";
+        std::cout << "Station "
+                  << snapshot.stations[i].stationId
+                  << ": ";
+
+        if (snapshot.stations[i].occupied)
+        {
+            std::cout << "Occupied"
+                      << " | Cooking Timer="
+                      << snapshot.stations[i].cookingTimeRemaining;
+        }
+        else
+        {
+            std::cout << "Empty";
+        }
+
+        std::cout << "\n";
     }
-    else
+
+    std::cout << "\n";
+
+    // ---------------------------------
+    // Order state
+    // ---------------------------------
+
+    std::cout << "=== Orders ===\n";
+
+    for (int i = 0; i < 2; i++)
     {
-        std::cout << "FAIL: Player 1 should have been able to chop.\n";
+        std::cout << "Order "
+                  << snapshot.orders[i].orderId
+                  << ": Time="
+                  << snapshot.orders[i].timeRemaining
+                  << " Completed="
+                  << (snapshot.orders[i].completed
+                          ? "YES"
+                          : "NO")
+                  << " Expired="
+                  << (snapshot.orders[i].expired
+                          ? "YES"
+                          : "NO")
+                  << "\n";
     }
 
-    std::cout << "\nMoving Player 1 far away...\n";
+    std::cout << "\n";
 
-    // Move player far away
-    game.getPlayer1().setPosition(1.0f, 1.0f);
+    // ---------------------------------
+    // Score
+    // ---------------------------------
 
-    std::cout << "Player 1 position: ("
-              << game.getPlayer1().getX() << ", "
-              << game.getPlayer1().getY() << ")\n";
+    std::cout << "=== Score ===\n";
 
-    // Reset lettuce so it can be chopped again
-    lettuce.setState(ItemState::Raw);
-
-    std::cout << "Testing distant interaction...\n";
-
-    if (game.chopAtStation(1, 2))
-    {
-        std::cout << "FAIL: Player 1 should NOT be able to chop from far away.\n";
-    }
-    else
-    {
-        std::cout << "PASS: Interaction correctly rejected because Player 1 is too far away.\n";
-    }
+    std::cout << "Score: "
+              << snapshot.score
+              << "\n";
 
     return 0;
 }

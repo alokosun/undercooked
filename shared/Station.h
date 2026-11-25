@@ -20,6 +20,8 @@ private:
     int x;
     int y;
     Item* currentItem;
+    int cookingTimeRemaining;
+    int cookingDuration;
 
 public:
     Station(int stationId, StationType stationType, int xPos, int yPos);
@@ -39,6 +41,10 @@ public:
     bool chopItem();
     bool startCooking();
     bool finishCooking();
+
+    void updateCookingTimer(int seconds);
+    int getCookingTimeRemaining() const;
+    bool isCooking() const;
 };
 
 #endif

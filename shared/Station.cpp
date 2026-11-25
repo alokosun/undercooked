@@ -5,7 +5,9 @@ Station::Station(int stationId, StationType stationType, int xPos, int yPos)
       type(stationType),
       x(xPos),
       y(yPos),
-      currentItem(nullptr)
+      currentItem(nullptr),
+      cookingTimeRemaining(0),
+      cookingDuration(5)
 {
 }
 
@@ -80,6 +82,8 @@ bool Station::startCooking()
     }
 
     currentItem->setState(ItemState::Cooking);
+    cookingTimeRemaining = cookingDuration;
+
     return true;
 }
 
@@ -94,4 +98,31 @@ bool Station::finishCooking()
 
     currentItem->setState(ItemState::Cooked);
     return true;
+}
+
+void Station::updateCookingTimer(int seconds)
+{
+    if (!isCooking())
+    {
+        return;
+    }
+
+    cookingTimeRemaining -= seconds;
+
+    if (cookingTimeRemaining <= 0)
+    {
+        cookingTimeRemaining = 0;
+        currentItem->setState(ItemState::Cooked);
+    }
+}
+
+int Station::getCookingTimeRemaining() const
+{
+    return cookingTimeRemaining;
+}
+
+bool Station::isCooking() const
+{
+    return currentItem != nullptr &&
+           currentItem->getState() == ItemState::Cooking;
 }
