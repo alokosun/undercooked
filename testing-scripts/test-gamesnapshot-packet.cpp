@@ -25,8 +25,8 @@ int main() {
     GameSnapshot test;
 
     std::cout << "Player Test: sending player 67 with position (-67, -67) holding a tomato" << std::endl;
-    test.player1 = PlayerSnapshot {67, -67, -67, true, ItemType::Tomato};
-    test.player2 = PlayerSnapshot {1, 69, 69, true, ItemType::Plate};
+    test.player1 = PlayerSnapshot {67, -67, -67, true, ItemType::Tomato, Direction::Left, PlayerAction::Chopping};
+    test.player2 = PlayerSnapshot {1, 69, 69, true, ItemType::Plate, Direction::Right, PlayerAction::Cooking};
     test.stations[0] = StationSnapshot {0, true, ItemType::Bun, ItemState::Raw, 0};
     test.stations[1] = StationSnapshot {1, true, ItemType::Patty, ItemState::Cooking, 2};
     test.stations[2] = StationSnapshot {2, true, ItemType::Lettuce, ItemState::Chopped, 0};
@@ -38,7 +38,7 @@ int main() {
 
     std::cout << "Test: " << std::endl << to_string(test) << std::endl;
 
-    encode(w, to_struct(test));
+    encode(w, to_protocol(test));
     std::cout << "After encode, " << std::to_string(w.remaining()) << " bytes remaining." << std::endl;
 
     std::cout << "BUFFER" << std::endl;
@@ -52,9 +52,27 @@ int main() {
 
     UDP_Snapshot api_fail;
     decode(r, api_fail);
-    GameSnapshot test_decode = to_class(api_fail);
+    GameSnapshot test_decode = from_protocol(api_fail);
+    std::cout << "Player 1 facing preserved: "
+          << (test_decode.player1.facing == Direction::Left ? "PASS" : "FAIL")
+          << std::endl;
+
+    std::cout << "Player 2 facing preserved: "
+            << (test_decode.player2.facing == Direction::Right ? "PASS" : "FAIL")
+            << std::endl;
     std::cout << "DECODED TEST" << std::endl << to_string(test_decode) << std::endl;
 
+    std::cout << "Player 1 action preserved: "
+          << (test_decode.player1.currentAction == PlayerAction::Chopping
+                  ? "PASS"
+                  : "FAIL")
+          << std::endl;
+
+    std::cout << "Player 2 action preserved: "
+            << (test_decode.player2.currentAction == PlayerAction::Cooking
+                    ? "PASS"
+                    : "FAIL")
+            << std::endl;
 }
 
 void clear_buffer(uint8_t* b, size_t capacity) {

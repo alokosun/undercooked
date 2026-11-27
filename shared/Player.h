@@ -1,13 +1,38 @@
 #ifndef PLAYER_H
 #define PLAYER_H
+
 #include "Item.h"
 
-class Player {
+enum class Direction
+{
+    Up,
+    Down,
+    Left,
+    Right
+};
+
+enum class PlayerAction
+{
+    Idle,
+    PickingUp,
+    Dropping,
+    Chopping,
+    Cooking,
+    Plating,
+    Serving
+};
+
+class Player
+{
 private:
     int id;
     float x;
     float y;
+
     Item* heldItem;
+
+    Direction facing;
+    PlayerAction currentAction;
 
 public:
     Player(int playerId, float startX, float startY);
@@ -25,6 +50,12 @@ public:
 
     bool pickUpItem(Item* item);
     Item* dropItem();
+
+    Direction getFacing() const;
+    void setFacing(Direction direction);
+
+    PlayerAction getCurrentAction() const;
+    void setCurrentAction(PlayerAction action);
 };
 
 #endif

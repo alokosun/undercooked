@@ -4,7 +4,7 @@
 #ifndef GAMESNAPSHOT_H
 #define GAMESNAPSHOT_H
 
-#include "Item.h"
+#include "Player.h"
 
 struct PlayerSnapshot
 {
@@ -13,6 +13,9 @@ struct PlayerSnapshot
     float y;
     bool holdingItem;
     ItemType heldItemType;
+    
+    Direction facing = Direction::Down;
+    PlayerAction currentAction = PlayerAction::Idle;
 };
 
 struct StationSnapshot

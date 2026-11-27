@@ -64,6 +64,23 @@ bool GameState::movePlayer(int playerId, int dx, int dy)
         return false;
     }
 
+    if (dx > 0)
+    {
+        player->setFacing(Direction::Right);
+    }
+    else if (dx < 0)
+    {
+        player->setFacing(Direction::Left);
+    }
+    else if (dy > 0)
+    {
+        player->setFacing(Direction::Down);
+    }
+    else if (dy < 0)
+    {
+        player->setFacing(Direction::Up);
+    }
+
     player->setPosition(
         static_cast<float>(newX),
         static_cast<float>(newY)
@@ -442,41 +459,106 @@ void GameState::updateCookingTimers(int seconds)
 
 bool GameState::handleAction(int playerId, ActionType action, int targetId)
 {
+    Player* player = nullptr;
+
+    if (playerId == 1)
+    {
+        player = &player1;
+    }
+    else if (playerId == 2)
+    {
+        player = &player2;
+    }
+    else
+    {
+        return false;
+    }
+
+    bool success = false;
+
     switch (action)
     {
         case ActionType::MoveUp:
-            return movePlayer(playerId, 0, -1);
+            success = movePlayer(playerId, 0, -1);
+            break;
 
         case ActionType::MoveDown:
-            return movePlayer(playerId, 0, 1);
+            success = movePlayer(playerId, 0, 1);
+            break;
 
         case ActionType::MoveLeft:
-            return movePlayer(playerId, -1, 0);
+            success = movePlayer(playerId, -1, 0);
+            break;
 
         case ActionType::MoveRight:
-            return movePlayer(playerId, 1, 0);
+            success = movePlayer(playerId, 1, 0);
+            break;
 
         case ActionType::Pickup:
-            return pickupFromStation(playerId, targetId);
+            success = pickupFromStation(playerId, targetId);
+            break;
 
         case ActionType::Drop:
-            return dropAtStation(playerId, targetId);
+            success = dropAtStation(playerId, targetId);
+            break;
 
         case ActionType::Chop:
-            return chopAtStation(playerId, targetId);
+            success = chopAtStation(playerId, targetId);
+            break;
 
         case ActionType::Cook:
-            return startCookingAtStation(playerId, targetId);
+            success = startCookingAtStation(playerId, targetId);
+            break;
 
         case ActionType::Plate:
-            return plateItem(playerId, targetId);
+            success = plateItem(playerId, targetId);
+            break;
 
         case ActionType::Serve:
-            return serveOrder(playerId, targetId);
+            success = serveOrder(playerId, targetId);
+            break;
 
         default:
             return false;
     }
+
+    if (!success)
+    {
+        return false;
+    }
+
+    switch (action)
+    {
+        case ActionType::Pickup:
+            player->setCurrentAction(PlayerAction::PickingUp);
+            break;
+
+        case ActionType::Drop:
+            player->setCurrentAction(PlayerAction::Dropping);
+            break;
+
+        case ActionType::Chop:
+            player->setCurrentAction(PlayerAction::Chopping);
+            break;
+
+        case ActionType::Cook:
+            player->setCurrentAction(PlayerAction::Cooking);
+            break;
+
+        case ActionType::Plate:
+            player->setCurrentAction(PlayerAction::Plating);
+            break;
+
+        case ActionType::Serve:
+            player->setCurrentAction(PlayerAction::Serving);
+            break;
+
+        default:
+            player->setCurrentAction(PlayerAction::Idle);
+            break;
+    }
+
+    return true;
 }
 
 GameSnapshot GameState::getSnapshot() const
@@ -498,6 +580,8 @@ GameSnapshot GameState::getSnapshot() const
             player1.getHeldItem()->getType();
     }
 
+    snapshot.player1.facing = player1.getFacing();
+    snapshot.player1.currentAction = player1.getCurrentAction();
     // -----------------------------
     // Player 2
     // -----------------------------
@@ -513,6 +597,8 @@ GameSnapshot GameState::getSnapshot() const
             player2.getHeldItem()->getType();
     }
 
+    snapshot.player2.facing = player2.getFacing();
+    snapshot.player2.currentAction = player2.getCurrentAction();
     // -----------------------------
     // Stations
     // -----------------------------

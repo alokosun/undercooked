@@ -68,6 +68,14 @@ enum class LeaveReason : uint8_t {
 constexpr uint8_t kBtnInteract = 1 << 0;
 constexpr uint8_t kBtnPickDrop = 1 << 1;
 
+// Player action flags used in UDP_PlayerSnapshot.flags
+constexpr uint8_t kFlagChopping = 1 << 0;
+constexpr uint8_t kFlagCooking  = 1 << 1;
+constexpr uint8_t kFlagPlating  = 1 << 2;
+constexpr uint8_t kFlagServing  = 1 << 3;
+constexpr uint8_t kFlagPickup   = 1 << 4;
+constexpr uint8_t kFlagDrop     = 1 << 5;
+
 inline bool is_known_tcp_type(uint8_t t) { return t >= 1 && t <= 11; }
 inline bool is_known_udp_type(uint8_t t) { return t >= 1 && t <= 4; }
 

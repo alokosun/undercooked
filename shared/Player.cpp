@@ -4,28 +4,35 @@ Player::Player(int playerId, float startX, float startY)
     : id(playerId),
       x(startX),
       y(startY),
-      heldItem(nullptr)
+      heldItem(nullptr),
+      facing(Direction::Down),
+      currentAction(PlayerAction::Idle)
 {
 }
 
-int Player::getId() const {
+int Player::getId() const
+{
     return id;
 }
 
-float Player::getX() const {
+float Player::getX() const
+{
     return x;
 }
 
-float Player::getY() const {
+float Player::getY() const
+{
     return y;
 }
 
-void Player::setPosition(float newX, float newY) {
+void Player::setPosition(float newX, float newY)
+{
     x = newX;
     y = newY;
 }
 
-void Player::move(float dx, float dy) {
+void Player::move(float dx, float dy)
+{
     x += dx;
     y += dy;
 }
@@ -55,5 +62,26 @@ Item* Player::dropItem()
 {
     Item* item = heldItem;
     heldItem = nullptr;
+
     return item;
+}
+
+Direction Player::getFacing() const
+{
+    return facing;
+}
+
+void Player::setFacing(Direction direction)
+{
+    facing = direction;
+}
+
+PlayerAction Player::getCurrentAction() const
+{
+    return currentAction;
+}
+
+void Player::setCurrentAction(PlayerAction action)
+{
+    currentAction = action;
 }
