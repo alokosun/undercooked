@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMESNAPSHOT_H
+#define GAMESNAPSHOT_H
 
 #include "Item.h"
 
@@ -39,3 +40,5 @@ struct GameSnapshot
 
     int score;
 };
+
+#endif
