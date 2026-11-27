@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-//ORDER SNAPSHOT
-UDP_OrderSnapshot to_struct (const OrderSnapshot& s) {
+//ORDER SNAPSHOT to/from protocol
+UDP_OrderSnapshot to_protocol (const OrderSnapshot& s) {
     return UDP_OrderSnapshot {
         to_uint8(s.orderId), 
         uint8_t(s.recipe), 
@@ -12,8 +12,8 @@ UDP_OrderSnapshot to_struct (const OrderSnapshot& s) {
         s.expired
     };
 }
-//TODO
-OrderSnapshot to_class(const UDP_OrderSnapshot& su) {
+
+OrderSnapshot from_protocol(const UDP_OrderSnapshot& su) {
     return OrderSnapshot {
         int(su.id),
         RecipeType(su.type),
@@ -23,8 +23,8 @@ OrderSnapshot to_class(const UDP_OrderSnapshot& su) {
     };
 }
 
-//STATION SNAPSHOT
-UDP_StationSnapshot to_struct(const StationSnapshot& s) {
+//STATION SNAPSHOT to/from protocol
+UDP_StationSnapshot to_protocol(const StationSnapshot& s) {
     return UDP_StationSnapshot {
         to_uint8(s.stationId),
         s.occupied,
@@ -34,7 +34,7 @@ UDP_StationSnapshot to_struct(const StationSnapshot& s) {
     };
 }
 
-StationSnapshot to_class(const UDP_StationSnapshot& su) {
+StationSnapshot from_protocol(const UDP_StationSnapshot& su) {
     return StationSnapshot {
         int(su.id),
         su.occupied,
@@ -44,8 +44,8 @@ StationSnapshot to_class(const UDP_StationSnapshot& su) {
     };
 }
 
-//PLAYERSNAPSHOT
-UDP_PlayerSnapshot to_struct(const PlayerSnapshot& s) {
+//PLAYERSNAPSHOT to/from protocol
+UDP_PlayerSnapshot to_protocol(const PlayerSnapshot& s) {
     return UDP_PlayerSnapshot {
         to_uint8(s.playerId),
         to_int16(s.x),
@@ -57,7 +57,7 @@ UDP_PlayerSnapshot to_struct(const PlayerSnapshot& s) {
 
 }
 
-PlayerSnapshot to_class(const UDP_PlayerSnapshot& su) {
+PlayerSnapshot from_protocol(const UDP_PlayerSnapshot& su) {
     return PlayerSnapshot {
         int(su.id),
         float(su.x),
@@ -67,11 +67,11 @@ PlayerSnapshot to_class(const UDP_PlayerSnapshot& su) {
     };
 }
 
-//SNAPSHOT
-UDP_Snapshot to_struct(const GameSnapshot& s) {
+//SNAPSHOT to/from protocol
+UDP_Snapshot to_protocol(const GameSnapshot& s) {
     UDP_Snapshot s_out;
-    s_out.players[0] = to_struct(s.player1);
-    s_out.players[1] = to_struct(s.player2);
+    s_out.players[0] = to_protocol(s.player1);
+    s_out.players[1] = to_protocol(s.player2);
     s_out.num_players = 2;
     
     uint8_t counter = 0;
@@ -79,7 +79,7 @@ UDP_Snapshot to_struct(const GameSnapshot& s) {
         if (false) { //TODO: DETECT EMPTY/NON-RELEVANT STATIONS
             continue;
         }
-        s_out.stations[i] = to_struct(s.stations[i]);
+        s_out.stations[i] = to_protocol(s.stations[i]);
         counter++;
     }
     s_out.num_stations = counter;
@@ -89,7 +89,7 @@ UDP_Snapshot to_struct(const GameSnapshot& s) {
         if (false) {//TODO: DETECT EMPTY ORDERS
             continue;
         }
-        s_out.orders[i] = to_struct(s.orders[i]);
+        s_out.orders[i] = to_protocol(s.orders[i]);
         counter++;
     }
     s_out.num_orders = counter;
@@ -99,17 +99,17 @@ UDP_Snapshot to_struct(const GameSnapshot& s) {
     return s_out;
 }
 
-GameSnapshot to_class(const UDP_Snapshot& su) {
+GameSnapshot from_protocol(const UDP_Snapshot& su) {
      GameSnapshot s;
-     s.player1 = to_class(su.players[0]);
-     s.player2 = to_class(su.players[1]);
+     s.player1 = from_protocol(su.players[0]);
+     s.player2 = from_protocol(su.players[1]);
 
      for (int i = 0; i < su.num_orders; i++) {
-        s.orders[i] = to_class(su.orders[i]);
+        s.orders[i] = from_protocol(su.orders[i]);
      }
 
      for (int i = 0; i < su.num_stations; i++) {
-        s.stations[i] = to_class(su.stations[i]);
+        s.stations[i] = from_protocol(su.stations[i]);
      }
 
      s.score = su.score;
@@ -117,6 +117,7 @@ GameSnapshot to_class(const UDP_Snapshot& su) {
      return s;
 }
 
+//UNIT CONVERSIONS
 uint8_t to_uint8(int i) {
     if (i < 0) return 0;
     if (i > 255) return 255;

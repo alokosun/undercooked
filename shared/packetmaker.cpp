@@ -1,5 +1,4 @@
 #include "packetmaker.h"
-#include <iostream>
 
 //GAME SNAPSHOT
 void encode (Buffer_Writer& w, const UDP_Snapshot& s) {
@@ -41,7 +40,7 @@ void decode(Buffer_Reader& r, UDP_Snapshot& s) {
 }
 
 
-//Player snapshot
+//PLAYER SNAPSHOT
 void encode(Buffer_Writer& w, const UDP_PlayerSnapshot& s) {
     w.u8(s.id);
     w.i16(s.x);
@@ -59,7 +58,7 @@ void decode (Buffer_Reader& r, UDP_PlayerSnapshot& s) {
     s.flags = r.u8();
 }
 
-//Order Snapshot
+//ORDER SNAPSHOT
 void encode(Buffer_Writer& w, const UDP_OrderSnapshot& s) {
     w.u8(s.id);
     w.u8(s.type);
@@ -75,7 +74,7 @@ void decode(Buffer_Reader& r, UDP_OrderSnapshot& s) {
     s.expired = r.boolean();
 }
 
-//Station Snapshot
+//STATION SNAPSHOT
 void encode(Buffer_Writer& w, const UDP_StationSnapshot& s) {
     w.u8(s.id);
     w.boolean(s.occupied);

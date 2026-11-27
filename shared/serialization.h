@@ -1,3 +1,6 @@
+//Author: Claude
+//handles translation between protocol structs and bytes in a buffer
+
 // serialization.h - explicit, bounds-checked, network-byte-order (big-endian) I/O.
 //
 // Never cast structs to bytes: padding and endianness differ between the Windows
@@ -6,6 +9,7 @@
 // Both classes use a sticky failure flag instead of exceptions: after any overflow /
 // underflow ok() is false, further operations are no-ops (reads return 0), and the
 // caller checks ok() once after parsing a whole message.
+
 #pragma once
 
 #include <cstddef>

@@ -1,3 +1,6 @@
+//Author: Alyssa
+//Struct definitions of Snapshots to be used by backend
+
 #ifndef GAMESNAPSHOT_H
 #define GAMESNAPSHOT_H
 

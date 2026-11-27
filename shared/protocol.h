@@ -1,3 +1,4 @@
+//Author: Claude ft Grace
 //definitions of messages that could be sent
 
 // TCP control channel. Frame = [u16 length][u8 type][payload]; length counts the
@@ -23,6 +24,7 @@
 //  Snapshot  S->C  u32 tick,u16 time_left,u16 score,u8 n,        full state; next one
 //                  n * (id, i16 x, i16 y, facing, held, flags)    replaces a lost one
 // ---------------------------------------------------------------------------
+
 #pragma once
 
 #include <cstdint>

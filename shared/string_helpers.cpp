@@ -1,6 +1,10 @@
 #ifndef STRING_HELPERS_CPP
 #define STRING_HELPERS_CPP
 
+/*
+Mildly batshit number of to_string functions. For debugging usage.
+*/
+
 #include "api.h"
 #include "Item.h"
 #include "protocol.h"

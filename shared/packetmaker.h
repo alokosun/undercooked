@@ -1,14 +1,17 @@
-//Functions that make packets
+//Author: Grace
+//Functions that make packets from protocol defined structs
+//TODO: make class that will construct and deconstruct packets
+//      for various messgaes and handle buffer reading/writing
+//encode/decodes will be private, and some kinda public interface will exist
+
 #ifndef PACKETMAKER_H
 #define PACKETMAKER_H
 
 #include "protocol.h"
 #include "serialization.h"
-#include "GameSnapshot.h"
-#include "Player.h"
 
 //snapshot
-void encode (Buffer_Writer& w, const UDP_Snapshot& s);
+void encode(Buffer_Writer& w, const UDP_Snapshot& s);
 void decode(Buffer_Reader& r, UDP_Snapshot& s);
 
 //Player snapshot

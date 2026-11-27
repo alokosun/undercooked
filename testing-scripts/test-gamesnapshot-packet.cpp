@@ -1,3 +1,6 @@
+//Author: Grace
+//Encode and decode single game snapshot - uses 71 bytes atm.
+
 #include <iostream>
 #include <iomanip>
 
