@@ -6,8 +6,8 @@
 #include <cstring>
 #include <thread>
 
-int main() {
-    //platform_init();
+int base_TCP_test() {
+    platform_init();
 
     // 1. Create server socket
     Socket server = tcp_create();
@@ -98,8 +98,9 @@ int main() {
     close_socket(client);
     close_socket(server);
 
-    //platform_shutdown();
+    platform_shutdown();
 
     std::cout << "Test completed successfully\n";
     return 0;
 }
+

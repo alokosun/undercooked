@@ -1,13 +1,14 @@
 #include "net-platform.h"
 
 #include <cstring>
-
-//DIFFERENT FOR WINDOWS
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <unistd.h>
-const Socket BAD_SOCKET = -1;
-#define ERR(name) name
+
+//error definitions
+#ifdef _WIN32 //windows
+    #define ERR(name) WSA##name
+#else //linux
+    #define ERR(name) name
+#endif
 
 static int last_err() {
     #ifdef _WIN32 //windows
@@ -17,9 +18,28 @@ static int last_err() {
     #endif
 }
 
+//for tracking of initialization
+bool INITIALIZED = false;
+
 //Initialization
-bool platform_init(); //initializes networking subsystem (Winsock initialization...)
-void platform_shutdown(); //housekeeping
+//initializes networking subsystem (mostly for Winsock...)
+bool platform_init() {
+    #ifdef _WIN32
+        if (INITIALIZED) return false;
+        WSADATA data;
+        WSAStartup(MAKEWORD(2, 2), &data);
+        INITIALIZED = true;
+    #endif
+    return true;
+}
+//closes winsock
+void platform_shutdown() {
+    #ifdef _WIN32
+        if (!INITIALIZED) return;
+        WSACleanup();
+        INITIALIZED = false;
+    #endif
+}
 
 //SOCKET MANAGEMENT
 //makes ipv4 TCP socket
@@ -50,8 +70,11 @@ bool bind_port(Socket& s, uint16_t port) {
 
 //close a socket
 void close_socket(Socket& s) { 
-    close(s);
-    //DIFFERENT FOR WINDOWS  
+    #ifdef _WIN32 //windows
+        closesocket(s);
+    #else //linux
+        close(s);
+    #endif 
 }
 
 bool set_nonblocking(Socket& s); //configures a socket to return operations immediately.
@@ -61,8 +84,12 @@ int poll_sockets(PollItem* items, size_t count, int timeout_ms); //checks multip
 //TCP COMMUNICAION
 //sends bytes through a TCP socket
 IoResult tcp_send(Socket& s, const void* data, size_t len) {
-    //flag MSG_NOSIGNAL prevents process from terminating when sending to a closed socket on Linux
-    int bytes_out = static_cast<int>(send(s, data, len, MSG_NOSIGNAL)); //returns num bytes sent
+    #ifdef _WIN32 //windows
+        int bytes_out = send(s, (const char*) data, static_cast<int>(len), 0);
+    #else //Linux (oh boi this is a trend)
+        //flag MSG_NOSIGNAL prevents process from terminating when sending to a closed socket on Linux
+        int bytes_out = static_cast<int>(send(s, data, len, MSG_NOSIGNAL)); //returns num bytes sent
+    #endif
     if (bytes_out < 0) return fail_result(false); //error handling
     return IoResult{
         (bytes_out == 0 && len > 0) ? Result::WouldBlock : Result::Ok, //WouldBlock if nothing sent, ok if information sent
@@ -71,8 +98,13 @@ IoResult tcp_send(Socket& s, const void* data, size_t len) {
 }
 
 //receives bytes from a TCP socket
-IoResult tcp_recv(Socket& s, void* buf, size_t len) {
-    int bytes_received = static_cast<int>(recv(s, buf, len, 0)); //returns num bytes received
+IoResult tcp_recv(Socket& s, void* data, size_t len) {
+    #ifdef _WIN32 //windows
+        int bytes_received = recv(s, (char*) data, static_cast<int>(len), 0);
+    #else //linux
+        int bytes_received = static_cast<int>(recv(s, data, len, 0)); //returns num bytes received
+    #endif
+
     if (bytes_received < 0) return fail_result(false); //error handling
     return IoResult {
         (bytes_received == 0 && len > 0) ? Result::Closed : Result::Ok, //closed if no bytes received, ok if bytes received
@@ -89,7 +121,7 @@ bool listen_on(Socket& s, int backlog) {
 //Accepts TCP connection from listener. Returns client socket and stores client address in peer
 Socket accept_client(Socket& listener, Address* peer = nullptr, Result* res = nullptr) {
     sockaddr_in sock;
-    socklen_t sock_length = sizeof(sock);
+    SocketLength sock_length = sizeof(sock);
     std::memset(&sock, 0, sizeof(sock)); //initialize sock to 0
     Socket client = accept(
         listener, //listening socket
@@ -163,7 +195,7 @@ Address sockaddr_to_Address(const sockaddr_in& sock) {
 
 // Translate an OS error into a normalized category. `udp` selects datagram semantics,
 // where "connection reset/refused" style errors are harmless noise.
-//Claude generated
+//Claude generated... for Linux only LOL
 Result map_error(int e, bool udp) {
     if (e == ERR(EWOULDBLOCK) || e == ERR(EINTR) || e == ERR(EINPROGRESS)) return Result::WouldBlock;
 
@@ -174,7 +206,7 @@ Result map_error(int e, bool udp) {
     if (udp) {
         if (e == ERR(ECONNRESET) || e == ERR(ECONNREFUSED) || e == ERR(EMSGSIZE) || e == ERR(ENETUNREACH) ||
             e == ERR(EHOSTUNREACH) || e == ERR(ENETRESET)) {
-        return Result::Ignorable;
+            return Result::Ignorable;
         }
         return Result::Fatal;
     }

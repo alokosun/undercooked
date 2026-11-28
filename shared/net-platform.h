@@ -7,13 +7,27 @@
 #include <cstdint>
 #include <cstddef>
 #include <chrono>
-#include <netinet/in.h>
 
 static uint16_t TCP_PORT = 8005;
 static uint16_t UDP_PORT = 8006;
 
-//DIFFERENT FOR WINDOWS
-using Socket = int;
+#ifdef _WIN32 //windows
+  #include <winsock2.h>
+  #include <ws2tcpip.h>
+  using Socket = SOCKET;
+  using SocketLength = int;
+  const Socket BAD_SOCKET = INVALID_SOCKET;
+
+#else //linux
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/in.h>
+  using Socket = int;
+  using SocketLength = socklen_t;
+  const Socket BAD_SOCKET = -1;
+#endif
+
 inline bool valid_socket(Socket s) {return s >= 0;};
 
 enum class Result { Ok, WouldBlock, Closed, Reset, Ignorable, Fatal };
