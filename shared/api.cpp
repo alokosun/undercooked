@@ -2,6 +2,20 @@
 
 #include <cmath>
 
+uint8_t* broadcast_snapshot(const OrderSnapshot& s) {
+    size_t capacity = MAX_PACKET_SIZE;
+    uint8_t buffer[capacity];
+    Buffer_Writer w = Buffer_Writer(buffer, capacity);
+
+    encode(w, to_protocol(s));
+
+    //TODO: IMPLEMENT NETWORKING
+    //THIS IS TEMPORARY AND DOES CAUSE A MEMORY LEAK
+    return buffer;
+
+    delete[] buffer;
+}
+
 //ORDER SNAPSHOT to/from protocol
 UDP_OrderSnapshot to_protocol (const OrderSnapshot& s) {
     return UDP_OrderSnapshot {

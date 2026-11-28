@@ -38,7 +38,7 @@ int main() {
 
     std::cout << "Test: " << std::endl << to_string(test) << std::endl;
 
-    encode(w, to_struct(test));
+    encode(w, to_protocol(test));
     std::cout << "After encode, " << std::to_string(w.remaining()) << " bytes remaining." << std::endl;
 
     std::cout << "BUFFER" << std::endl;
@@ -52,7 +52,7 @@ int main() {
 
     UDP_Snapshot api_fail;
     decode(r, api_fail);
-    GameSnapshot test_decode = to_class(api_fail);
+    GameSnapshot test_decode = from_protocol(api_fail);
     std::cout << "DECODED TEST" << std::endl << to_string(test_decode) << std::endl;
 
 }
@@ -62,5 +62,3 @@ void clear_buffer(uint8_t* b, size_t capacity) {
         b[i] = 0;
     }
 }
-
-

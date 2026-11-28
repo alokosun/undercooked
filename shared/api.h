@@ -7,6 +7,12 @@
 
 #include "protocol.h"
 #include "GameSnapshot.h"
+#include "packetmaker.h"
+#include "serialization.h"
+
+const int MAX_PACKET_SIZE = 100;
+
+uint8_t* broadcast_snapshot(const OrderSnapshot& s);
 
 UDP_OrderSnapshot to_protocol (const OrderSnapshot& s);
 OrderSnapshot from_protocol (const UDP_OrderSnapshot& su);
